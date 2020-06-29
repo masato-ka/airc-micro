@@ -6,7 +6,7 @@ airc-micro is most tiny AI RC Car project. No camera, no powerful cpu and AI acc
 
 Using simple distance sensor and cheap cpu board such as ESP32, STM32F1xx.
 
-NN is learning on cloud. And deploy to microcontroller by (tensorflow lite for microcontroller)[https://www.tensorflow.org/lite/microcontrollers].
+NN is learning on cloud. And deploy to microcontroller by [tensorflow lite for microcontroller](https://www.tensorflow.org/lite/microcontrollers).
 
 ## Install 
 
@@ -14,7 +14,7 @@ Now, this software target is ESP32-WROOM-D. You can use Arduino IDE.
 
 ### Install Library
 
-Install (Arduino_TensorFlowLite_ESP32)[https://github.com/tanakamasayuki/Arduino_TensorFlowLite_ESP32].
+Install [Arduino_TensorFlowLite_ESP32](https://github.com/tanakamasayuki/Arduino_TensorFlowLite_ESP32).
 
 ## Usage
 
@@ -47,4 +47,4 @@ his software license under MIT licence.
 
 ## Autor 
 
-(masato-ka)[https://github.com/masato-ka/airc-rl-agent]
+[masato-ka](https://github.com/masato-ka/airc-rl-agent)
