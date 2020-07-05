@@ -1,3 +1,13 @@
+#include <Arduino.h>
+#include "include/interface/parts/motor_driver.h"
+#include "include/drv8835_impl.h"
+#include "include/interface/parts/range_sensor.h"
+#include "include/range_sensor_impl.h"
+#include "include/interface/agent/agent.h"
+#include "include/pid_agent_impl.h"
+#include "include/remote_agent_impl.h"
+#include "include/agent_factory_impl.h"
+
 #include <TensorFlowLite_ESP32.h>
 #include "tensorflow/lite/experimental/micro/kernels/all_ops_resolver.h"
 #include "tensorflow/lite/experimental/micro/micro_error_reporter.h"
@@ -20,6 +30,10 @@ namespace {
   constexpr int kTensorArenaSize = 2 * 1024;
   uint8_t tensor_arena[kTensorArenaSize];
 } 
+
+airc::MotorDriver* motorDriver = nullptr; 
+airc::RangeSensor* rangeSensor = nullptr;
+airc::Agent* agent = nullptr;
 
 void setup() {
 
@@ -59,25 +73,32 @@ void setup() {
   Serial.print(input->dims->size);
   Serial.print(input->dims->data[0]);
   Serial.print(input->dims->data[1]);
+
+  // //Imlplements to factory class(MotorFactory).
+  Serial.println("Initialize motor driver");
+  motorDriver = new airc::DRV8835Impl();
+  motorDriver->init();
+
+  // //Imlplements to factory class(SensorFactory).
+  Serial.println("Initialize range sensor");
+  rangeSensor = new airc::RangeSensorImpl();
+  rangeSensor->setAddress((uint8_t)21,(uint8_t)22,(uint8_t)20);
+
+  //Imlplements to factory(AgentFactory).
+  Serial.println("Initialize Agent");
+  String agent_name = airc::AGENT_NAME;
+  if(!strcmp(agent_name.c_str(), "nnagent")){
+    agent = new airc::NNAgentImpl();
+    ((airc::NNAgentImpl*)agent)->setModel(interpreter, error_reporter);
+  }else{
+    agent = new airc::PidAgentImpl();
+  }
+  agent->initialize(motorDriver, rangeSensor);
+
+
 }
 
 void loop() {
-                   
-  input->data.f[0]=3.74626993;// center
-  input->data.f[1]=1.21416047;// right
-  input->data.f[2]=2.05516886;// left
-
-  TfLiteStatus invoke_status = interpreter->Invoke();
-  if (invoke_status != kTfLiteOk) {
-    error_reporter->Report("Invoke failed on 1.: %f\n",
-                           static_cast<double>(1.));
-    return;
-  }
-
-  float omega = output->data.f[0];//舵角
-  float nu = output->data.f[1];//速度
-  Serial.print("omega: ");
-  Serial.println(omega);
-  Serial.print("nu: ");
-  Serial.println(nu);
+  Serial.println("Loop");
+  agent->drive();
 }
